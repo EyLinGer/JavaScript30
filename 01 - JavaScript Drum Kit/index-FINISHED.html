@@ -75,16 +75,14 @@
     }
 
     function deactivateKey(e) {
-      // if(e.propertyName !== "transform") return; 这行代码应该删除，如果保留，在频繁点击同一个按键时，会导致playing类别移除失败。因为transitionend事件中的peropertyName不一定是transform。
-      this.classList.remove("playing");
+      const key = document.querySelector(`.key[data-key="${e.keyCode}"]`);
+      if (null == key) return;
+      key.classList.remove("playing");
     }
 
     window.addEventListener('keydown', playSound);
     window.addEventListener('keydown', activateKey);
-
-    const keys = document.querySelectorAll('.key');
-    keys.forEach(key => key.addEventListener('transitionend', deactivateKey));
-
+    window.addEventListener('keyup', deactivateKey);
 
   </script>
 
