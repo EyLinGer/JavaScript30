@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>HTML5 Canvas</title>
+</head>
+
+<body>
+    <canvas id="draw" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.querySelector('#draw');
+        const ctx = canvas.getContext('2d');
+        const lineWidthOverflowEvent = new Event('linewidth-overflow');
+        let start = { x: 0, y: 0 };
+        let isDrawing = false;
+        let hue = 0;
+        let isLineWidthIncrese = true;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        ctx.lineCap = 'round';
+
+        function prepareDrawing(e) {
+            isDrawing = true;
+            [start.x, start.y] = [e.offsetX, e.offsetY]
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function doDrawing(e) {
+            if (!isDrawing) return;
+            const end = {
+                x: e.offsetX,
+                y: e.offsetY
+            }
+            drawLine(start, end);
+            start = end;
+        }
+
+        function drawLine(start, end) {
+            ctx.beginPath();
+            ctx.moveTo(start.x, start.y);
+            ctx.lineTo(end.x, end.y);
+            forwardLineWidth();
+            ctx.strokeStyle = `hsl(${hue++}, 100%, 50%)`;
+            ctx.stroke();
+        }
+
+        function forwardLineWidth() {
+            isLineWidthIncrese ? ctx.lineWidth++ : ctx.lineWidth--;
+            if (ctx.lineWidth >= 100 || ctx.lineWidth <= 1) {
+                window.dispatchEvent(lineWidthOverflowEvent);
+            }
+        }
+
+        window.addEventListener('mousedown', prepareDrawing);
+        window.addEventListener('mouseup', stopDrawing);
+        window.addEventListener('mousemove', doDrawing);
+        window.addEventListener('mouseout', stopDrawing);
+        window.addEventListener('linewidth-overflow', () => isLineWidthIncrese = !isLineWidthIncrese);
+    </script>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+        }
+    </style>
+
+</body>
+
+</html>
